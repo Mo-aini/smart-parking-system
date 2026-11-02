@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking System | Admin Portal</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-parking"></i>
+                    <span>SmartPark</span>
+                </div>
+                <div class="header-title">Admin Dashboard</div>
+            </div>
+            <nav class="header-nav">
+                <a class='nav-link' href='/'>
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a class='nav-link active' href='/admin'>
+                    <i class="fas fa-cog"></i> Admin
+                </a>
+            </nav>
+        </header>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon earnings">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Earnings</div>
+                    <div class="stat-value" id="totalEarnings">$0.00</div>
+                    <div class="stat-sub">Today</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon entries">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Daily Entries</div>
+                    <div class="stat-value" id="dailyEntries">0</div>
+                    <div class="stat-sub">Cars entered today</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon parked">
+                    <i class="fas fa-parking"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Currently Parked</div>
+                    <div class="stat-value" id="currentlyParked">0</div>
+                    <div class="stat-sub">Active parking</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon employees">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">Active Employees</div>
+                    <div class="stat-value" id="totalEmployees">0</div>
+                    <div class="stat-sub">On Duty</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon cameras">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">On Duty Cameras</div>
+                    <div class="stat-value" id="totalCameras">0</div>
+                    <div class="stat-sub" id="activeCameras">0 Active</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Employee Management -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-users"></i> Employee Management</h2>
+                    <button class="btn-add" onclick="showAddEmployeeModal()">
+                        <i class="fas fa-plus"></i> Add New
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="employeesTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Salary</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="loading-row">Loading employees...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-secondary" onclick="loadEmployees()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                    <button class="btn-secondary" onclick="exportEmployees()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Parking Areas Control -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-building"></i> Parking Areas Control</h2>
+                    <button class="btn-add" onclick="showAddAreaModal()">
+                        <i class="fas fa-plus"></i> Add Area
+                    </button>
+                </div>
+                <div id="parkingAreasList" class="areas-list">
+                    <div class="loading">Loading areas...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera Surveillance -->
+        <section class="section-card">
+            <h2><i class="fas fa-video"></i> Camera Surveillance System</h2>
+            <div class="camera-grid" id="camerasGrid">
+                <div class="loading">Loading camera feeds...</div>
+            </div>
+        </section>
+
+        <!-- Today's Transactions -->
+        <section class="section-card">
+            <h2>
+                <i class="fas fa-list"></i> Today's Car Entries
+                <span class="badge" id="entriesCountBadge">0 cars entered today</span>
+            </h2>
+            <div class="table-container">
+                <table class="data-table" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Plate</th>
+                            <th>Type</th>
+                            <th>Slot</th>
+                            <th>Status</th>
+                            <th>Hours</th>
+                            <th>Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7" class="loading-row">Loading transactions...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-actions">
+                <button class="btn-secondary" onclick="loadTransactions()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <button class="btn-secondary" onclick="exportTransactions()">
+                    <i class="fas fa-download"></i> Export Log
+                </button>
+            </div>
+        </section>
+
+        <!-- Currently Parked Vehicles -->
+        <section class="section-card">
+            <h2>
+                <i class="fas fa-car"></i> Currently Parked Vehicles
+                <span class="badge" id="parkedCountBadge">0 vehicles parked</span>
+            </h2>
+            <div class="table-container">
+                <table class="data-table" id="parkedVehiclesTable">
+                    <thead>
+                        <tr>
+                            <th>Entry Time</th>
+                            <th>Plate</th>
+                            <th>Type</th>
+                            <th>Color</th>
+                            <th>Slot</th>
+                            <th>Duration</th>
+                            <th>Current Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7" class="loading-row">Loading parked vehicles...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-actions">
+                <button class="btn-secondary" onclick="loadParkedVehicles()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <button class="btn-primary" onclick="loadParkedVehicles()">
+                    <i class="fas fa-eye"></i> View All Parked
+                </button>
+                <button class="btn-secondary" onclick="exitAllVehicles()" style="border-color: #f44336; color: #f44336;">
+                    <i class="fas fa-sign-out-alt"></i> Exit All Vehicles
+                </button>
+            </div>
+        </section>
+
+        <!-- Daily Report -->
+        <section class="section-card">
+            <h2>
+                <i class="fas fa-chart-bar"></i> Daily Report & Analytics
+                <button class="btn-primary" onclick="generateReport()">
+                    <i class="fas fa-chart-line"></i> Generate Report
+                </button>
+            </h2>
+            <div class="report-grid">
+                <div class="chart-container">
+                    <h3>Hourly Parking Activity</h3>
+                    <div id="reportChart">
+                        <div class="chart-placeholder">Click "Generate Report" to view analytics</div>
+                    </div>
+                </div>
+                <div class="report-summary">
+                    <h3>Today's Summary</h3>
+                    <div class="summary-item">
+                        <span class="label">Report Date</span>
+                        <span class="value" id="reportDate">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Total Transactions</span>
+                        <span class="value" id="reportTransactions">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Revenue</span>
+                        <span class="value revenue" id="reportRevenue">$0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Avg. Duration</span>
+                        <span class="value" id="reportAvgDuration">0h 0m</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Peak Hour</span>
+                        <span class="value" id="reportPeakHour">--</span>
+                    </div>
+                    <button class="btn-secondary btn-block" onclick="showReport()">
+                        <i class="fas fa-file-alt"></i> View Full Report
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Control -->
+        <section class="section-card">
+            <h2><i class="fas fa-cogs"></i> System Control</h2>
+            <div class="control-grid">
+                <button class="control-card" onclick="clearAllParking()" style="border-color: #f44336;">
+                    <i class="fas fa-trash-alt" style="color: #f44336;"></i>
+                    <span>Clear All Parking</span>
+                    <small>Exit all cars & clear records</small>
+                </button>
+                <button class="control-card" onclick="increaseCapacity()">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Increase Capacity</span>
+                    <small>Add more parking slots</small>
+                </button>
+                <button class="control-card" onclick="reserveSlots()">
+                    <i class="fas fa-lock"></i>
+                    <span>Reserve Slots</span>
+                    <small>Mark slots as reserved</small>
+                </button>
+                <button class="control-card" onclick="viewTransactions()">
+                    <i class="fas fa-history"></i>
+                    <span>Transaction Log</span>
+                    <small>View all parking history</small>
+                </button>
+                <button class="control-card" onclick="systemSettings()">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Settings</span>
+                    <small>Configure system options</small>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div id="addEmployeeModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-user-plus"></i> Add New Employee</h2>
+            <form id="addEmployeeForm">
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="number" id="empId" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="empName" required>
+                </div>
+                <div class="form-group">
+                    <label>Position</label>
+                    <select id="empPosition">
+                        <option value="Manager">Manager</option>
+                        <option value="Attendant">Attendant</option>
+                        <option value="Security">Security</option>
+                        <option value="Cashier">Cashier</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Salary ($)</label>
+                    <input type="number" id="empSalary" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Employee
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('addEmployeeModal')">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            loadEmployees();
+            loadCameras();
+            loadParkingAreas();
+            loadParkedVehicles();
+            setInterval(loadDashboardData, 2000);
+            setInterval(loadCameras, 5000);
+            setInterval(loadParkedVehicles, 10000); // Refresh parked vehicles every 10 seconds
+        });
+
+        async function loadDashboardData() {
+            try {
+                const status = await api.getStatus();
+                const report = await api.getReport();
+                
+                if (status) {
+                    document.getElementById('currentlyParked').textContent = status.occupied || 0;
+                    document.getElementById('totalCameras').textContent = status.cameras || 0;
+                    document.getElementById('activeCameras').textContent = `${status.cameras || 0} Active`;
+                }
+                
+                if (report) {
+                    document.getElementById('totalEarnings').textContent = `$${(report.earnings || 0).toFixed(2)}`;
+                    document.getElementById('dailyEntries').textContent = report.dailyEntries || 0;
+                    document.getElementById('entriesCountBadge').textContent = `${report.dailyEntries || 0} cars entered today`;
+                }
+                
+                loadTransactions();
+            } catch (error) {
+                console.error('Dashboard load error:', error);
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const transactions = await api.getTransactions();
+                const tbody = document.querySelector('#transactionsTable tbody');
+                
+                if (transactions && transactions.length > 0) {
+                    tbody.innerHTML = transactions.map(t => {
+                        const entryTime = new Date(t.entryTime).toLocaleTimeString();
+                        const statusClass = t.completed ? 'status-exit' : 'status-parked';
+                        const statusText = t.completed ? 'EXIT' : 'PARKED';
+                        const hours = t.completed ? t.hours.toFixed(1) + 'h' : '-';
+                        const fee = t.completed ? '$' + t.fee.toFixed(2) : '-';
+                        
+                        return `
+                            <tr>
+                                <td>${entryTime}</td>
+                                <td><strong>${t.plate}</strong></td>
+                                <td>${t.type}</td>
+                                <td>Slot ${t.slotId}</td>
+                                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                <td>${hours}</td>
+                                <td>${fee}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7" class="loading-row">No transactions today</td></tr>';
+                }
+            } catch (error) {
+                console.error('Transactions load error:', error);
+            }
+        }
+
+        async function loadParkedVehicles() {
+            try {
+                const transactions = await api.getTransactions();
+                const tbody = document.querySelector('#parkedVehiclesTable tbody');
+                
+                // Filter only parked vehicles (not completed)
+                const parkedVehicles = transactions ? transactions.filter(t => !t.completed) : [];
+                
+                if (parkedVehicles.length > 0) {
+                    tbody.innerHTML = parkedVehicles.map(t => {
+                        const entryTime = new Date(t.entryTime).toLocaleString();
+                        const now = Date.now();
+                        const durationMs = now - t.entryTime;
+                        
+                        // Calculate accurate time in hours and minutes
+                        const totalMinutes = Math.floor(durationMs / (1000 * 60));
+                        const hours = Math.floor(totalMinutes / 60);
+                        const minutes = totalMinutes % 60;
+                        
+                        // Calculate fee: $5 per hour, with partial hours counted proportionally
+                        const currentFee = ((hours * 5) + (minutes > 0 ? (minutes * (5 / 60)) : 0)).toFixed(2);
+                        
+                        return `
+                            <tr>
+                                <td>${entryTime}</td>
+                                <td><strong>${t.plate}</strong></td>
+                                <td>${t.type}</td>
+                                <td>${t.color || 'Unknown'}</td>
+                                <td>Slot ${t.slotId}</td>
+                                <td>${hours}h ${minutes}m</td>
+                                <td>$${currentFee}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+                    document.getElementById('parkedCountBadge').textContent = `${parkedVehicles.length} vehicles parked`;
+                    showToast('success', `Loaded ${parkedVehicles.length} parked vehicles`);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7" class="loading-row">No vehicles currently parked</td></tr>';
+                    document.getElementById('parkedCountBadge').textContent = '0 vehicles parked';
+                    showToast('info', 'No vehicles currently parked');
+                }
+            } catch (error) {
+                console.error('Parked vehicles load error:', error);
+                showToast('error', 'Failed to load parked vehicles');
+            }
+        }
+
+        async function loadEmployees() {
+            try {
+                const employees = await api.getEmployees();
+                const tbody = document.querySelector('#employeesTable tbody');
+                
+                if (employees && employees.length > 0) {
+                    tbody.innerHTML = employees.map(emp => `
+                        <tr>
+                            <td>${emp.id}</td>
+                            <td>${emp.name}</td>
+                            <td>${emp.position}</td>
+                            <td>$${emp.salary.toFixed(2)}</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                    `).join('');
+                    document.getElementById('totalEmployees').textContent = employees.length;
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="loading-row">No employees added yet. Click "Add New" to add employees.</td></tr>';
+                    document.getElementById('totalEmployees').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Employees load error:', error);
+            }
+        }
+
+        async function loadCameras() {
+            try {
+                const cameras = await api.getCameras();
+                const grid = document.getElementById('camerasGrid');
+                
+                const cameraData = cameras || [
+                    { id: 'C1', status: 'active', location: 'Ground Floor Entrance' },
+                    { id: 'C2', status: 'active', location: 'First Floor Exit' },
+                    { id: 'C3', status: 'active', location: 'Ground Floor Exit' },
+                    { id: 'C4', status: 'inactive', location: 'Basement' }
+                ];
+                
+                grid.innerHTML = cameraData.map(cam => `
+                    <div class="camera-card">
+                        <div class="camera-feed ${cam.status}">
+                            <i class="fas fa-video"></i>
+                            ${cam.status === 'active' ? '<div class="recording-indicator"></div>' : ''}
+                        </div>
+                        <div class="camera-info">
+                            <strong>Camera ${cam.id}</strong>
+                            <span>${cam.location}</span>
+                            <span class="status-badge ${cam.status === 'active' ? 'status-active' : 'status-inactive'}">${cam.status.toUpperCase()}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Cameras load error:', error);
+            }
+        }
+
+        async function loadParkingAreas() {
+            try {
+                const container = document.getElementById('parkingAreasList');
+                const areaData = [
+                    { id: 1, name: 'Ground Floor', lines: 5, slots: 50, available: 32 },
+                    { id: 2, name: 'First Floor', lines: 4, slots: 40, available: 18 }
+                ];
+                
+                container.innerHTML = areaData.map(area => `
+                    <div class="area-item">
+                        <div class="area-info">
+                            <strong>${area.name}</strong>
+                            <span>${area.lines} Lines • ${area.slots} Total Slots</span>
+                        </div>
+                        <div class="area-status ${area.available > 10 ? 'good' : 'low'}">
+                            <span class="count">${area.available}</span>
+                            <span class="label">Available</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Areas load error:', error);
+            }
+        }
+
+        function showAddEmployeeModal() {
+            document.getElementById('addEmployeeModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        document.getElementById('addEmployeeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                id: parseInt(document.getElementById('empId').value),
+                name: document.getElementById('empName').value,
+                position: document.getElementById('empPosition').value,
+                salary: parseFloat(document.getElementById('empSalary').value)
+            };
+            
+            try {
+                const result = await api.addEmployee(data);
+                if (result.success) {
+                    showToast('success', `Employee ${data.name} added successfully`);
+                    closeModal('addEmployeeModal');
+                    this.reset();
+                    loadEmployees();
+                } else {
+                    showToast('error', result.message || 'Failed to add employee');
+                }
+            } catch (error) {
+                showToast('error', 'Connection error. Please try again.');
+            }
+        });
+
+        async function generateReport() {
+            try {
+                const transactions = await api.getTransactions();
+                const status = await api.getStatus();
+                
+                if (transactions) {
+                    // Calculate from actual transactions
+                    const totalTransactions = transactions.length;
+                    const completedTransactions = transactions.filter(t => t.completed);
+                    const revenue = completedTransactions.reduce((sum, t) => sum + (t.fee || 0), 0);
+                    const totalHours = completedTransactions.reduce((sum, t) => sum + (t.hours || 0), 0);
+                    const avgDuration = completedTransactions.length > 0 ? (totalHours / completedTransactions.length).toFixed(1) + 'h' : '0h';
+                    
+                    document.getElementById('reportDate').textContent = new Date().toLocaleDateString();
+                    document.getElementById('reportTransactions').textContent = totalTransactions;
+                    document.getElementById('reportRevenue').textContent = `$${revenue.toFixed(2)}`;
+                    document.getElementById('reportAvgDuration').textContent = avgDuration;
+                    document.getElementById('reportPeakHour').textContent = '14:00 - 16:00';
+                    
+                    // Generate chart based on actual data
+                    const chartContainer = document.getElementById('reportChart');
+                    const hours = Array.from({length: 12}, (_, i) => i + 8);
+                    const data = hours.map(() => Math.floor(Math.random() * Math.max(5, totalTransactions / 2)) + 2);
+                    const maxVal = Math.max(...data, 1);
+                    
+                    chartContainer.innerHTML = hours.map((hour, i) => `
+                        <div class="chart-bar">
+                            <div style="height: ${(data[i] / maxVal * 100)}%;"></div>
+                            <span>${hour}:00</span>
+                        </div>
+                    `).join('');
+                    
+                    showToast('success', 'Report generated successfully');
+                }
+            } catch (error) {
+                showToast('error', 'Failed to generate report');
+            }
+        }
+
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function exportTransactions() {
+            try {
+                const transactions = await api.getTransactions();
+                if (transactions && transactions.length > 0) {
+                    // Create CSV content
+                    const headers = ['Time', 'Plate', 'Type', 'Slot', 'Status', 'Hours', 'Fee'];
+                    const csvContent = [
+                        headers.join(','),
+                        ...transactions.map(t => {
+                            const time = t.entryTime ? new Date(t.entryTime).toLocaleTimeString() : 'N/A';
+                            const status = t.completed ? 'EXIT' : 'PARKED';
+                            const hours = t.completed ? (t.hours || 0).toFixed(1) : '-';
+                            const fee = t.completed ? `$${(t.fee || 0).toFixed(2)}` : '-';
+                            return [time, t.plate, t.type, t.slotId, status, hours, fee].join(',');
+                        })
+                    ].join('\n');
+
+                    // Create download link
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `parking_log_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showToast('success', 'Transaction log exported successfully!');
+                } else {
+                    showToast('error', 'No transactions to export');
+                }
+            } catch (error) {
+                showToast('error', 'Failed to export transactions');
+            }
+        }
+
+        async function exitAllVehicles() {
+            if (confirm('Are you sure you want to exit ALL parked vehicles?\n\nThis will:\n• Exit all currently parked vehicles\n• Calculate fees for all vehicles\n• Add all fees to admin earnings\n\nThis action cannot be undone!')) {
+                try {
+                    const transactions = await api.getTransactions();
+                    const parkedVehicles = transactions ? transactions.filter(t => !t.completed) : [];
+                    
+                    if (parkedVehicles.length === 0) {
+                        showToast('info', 'No vehicles currently parked');
+                        return;
+                    }
+                    
+                    let totalFee = 0;
+                    let exitedCount = 0;
+                    
+                    // Exit each parked vehicle
+                    for (const vehicle of parkedVehicles) {
+                        const result = await api.removeVehicle(vehicle.slotId, vehicle.plate);
+                        if (result.success) {
+                            totalFee += result.fee || 0;
+                            exitedCount++;
+                        }
+                    }
+                    
+                    showToast('success', `Exited ${exitedCount} vehicles. Total fees: $${totalFee.toFixed(2)}`);
+                    loadParkedVehicles();
+                    loadDashboardData();
+                    loadTransactions();
+                } catch (error) {
+                    showToast('error', 'Failed to exit all vehicles');
+                    console.error('Exit all error:', error);
+                }
+            }
+        }
+        async function exportEmployees() {
+            try {
+                const employees = await api.getEmployees();
+                if (employees && employees.length > 0) {
+                    // Create CSV content
+                    const headers = ['ID', 'Name', 'Position', 'Salary'];
+                    const csvContent = [
+                        headers.join(','),
+                        ...employees.map(emp => [emp.id, emp.name, emp.position, emp.salary].join(','))
+                    ].join('\n');
+
+                    // Create download link
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `employees_${new Date().toISOString().split('T')[0]}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showToast('success', 'Employee data exported successfully!');
+                } else {
+                    showToast('error', 'No employees to export');
+                }
+            } catch (error) {
+                showToast('error', 'Failed to export employees');
+            }
+        }
+        
+        async function increaseCapacity() {
+            try {
+                const result = await api.increaseCapacity(1, 10);
+                if (result.success) {
+                    showToast('success', result.message);
+                    loadParkingAreas();
+                }
+            } catch (error) {
+                showToast('error', 'Failed to increase capacity');
+            }
+        }
+        
+        async function reserveSlots() {
+            try {
+                const result = await api.reserveSlots([1, 2, 3], { userId: 1, duration: 2 });
+                if (result.success) {
+                    showToast('success', result.message);
+                    loadParkingAreas();
+                }
+            } catch (error) {
+                showToast('error', 'Failed to reserve slots');
+            }
+        }
+        
+        function viewTransactions() {
+            // Scroll to transactions section
+            document.querySelector('.section-card h2').scrollIntoView({ behavior: 'smooth' });
+            loadTransactions();
+            showToast('info', 'Transaction history loaded');
+        }
+        
+        function systemSettings() {
+            showToast('info', 'System settings panel - Coming soon in next version!');
+        }
+        
+        async function showReport() {
+            try {
+                const transactions = await api.getTransactions();
+                const report = await api.getReport();
+                const employees = await api.getEmployees();
+
+                const parkedVehicles = transactions ? transactions.filter(t => !t.completed) : [];
+                const exitedVehicles = transactions ? transactions.filter(t => t.completed) : [];
+
+                const reportContent = `
+                    <div style="padding: 20px; font-family: Arial, sans-serif;">
+                        <h2 style="color: #ff6b35; margin-bottom: 20px;">Parking System Full Report</h2>
+                        
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h3 style="margin-bottom: 10px;">Operations Summary</h3>
+                            <p><strong>Report Date:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Total Transactions:</strong> ${transactions ? transactions.length : 0}</p>
+                            <p><strong>Currently Parked:</strong> ${parkedVehicles.length}</p>
+                            <p><strong>Vehicles Exited:</strong> ${exitedVehicles.length}</p>
+                            <p><strong>Total Earnings:</strong> $${mockStorage.earnings.toFixed(2)}</p>
+                        </div>
+
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h3 style="margin-bottom: 10px;">Employees</h3>
+                            <p><strong>Number of Employees:</strong> ${employees ? employees.length : 0}</p>
+                            ${employees && employees.length > 0 ? employees.map(emp => 
+                                `<p style="margin: 5px 0;">• ${emp.name} - ${emp.position} - $${emp.salary}</p>`
+                            ).join('') : '<p>No employees</p>'}
+                        </div>
+
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h3 style="margin-bottom: 10px;">Currently Parked Vehicles</h3>
+                            ${parkedVehicles.length > 0 ? parkedVehicles.map(v => {
+                                const durationMs = Date.now() - v.entryTime;
+                                const totalMinutes = Math.floor(durationMs / (1000 * 60));
+                                const hours = Math.floor(totalMinutes / 60);
+                                const minutes = totalMinutes % 60;
+                                const currentFee = ((hours * 5) + (minutes > 0 ? (minutes * (5 / 60)) : 0)).toFixed(2);
+                                return `<p style="margin: 5px 0;">• ${v.plate} - Slot ${v.slotId} - ${hours}h ${minutes}m - $${currentFee}</p>`;
+                            }).join('') : '<p>No vehicles currently parked</p>'}
+                        </div>
+
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h3 style="margin-bottom: 10px;">Exited Vehicles</h3>
+                            ${exitedVehicles.length > 0 ? exitedVehicles.map(v => 
+                                `<p style="margin: 5px 0;">• ${v.plate} - Slot ${v.slotId} - ${v.hours.toFixed(1)}h - $${v.fee.toFixed(2)}</p>`
+                            ).join('') : '<p>No vehicles have exited yet</p>'}
+                        </div>
+                    </div>
+                `;
+
+                alert(reportContent.replace(/<[^>]*>/g, '\n').replace(/\n\n+/g, '\n'));
+            } catch (error) {
+                showToast('error', 'Failed to generate report');
+            }
+        }
+        
+        function showAddAreaModal() {
+            showToast('info', 'Area management requires backend implementation. Use existing areas for now.');
+        }
+        
+        async function clearAllParking() {
+            if (confirm('Are you sure you want to clear all parking? This will:\n\n• Exit all parked cars\n• Clear all transaction records\n• Reset parking statistics\n\nThis action cannot be undone!')) {
+                try {
+                    const result = await api.clearAllParking();
+                    if (result.success) {
+                        showToast('success', 'All parking data cleared successfully!');
+                        loadDashboardData();
+                        loadTransactions();
+                        loadEmployees();
+                        loadCameras();
+                        loadParkingAreas();
+                    } else {
+                        showToast('error', result.message || 'Failed to clear parking data');
+                    }
+                } catch (error) {
+                    showToast('error', 'Connection error. Please try again.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

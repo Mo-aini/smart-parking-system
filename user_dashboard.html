@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking System | User Portal</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-parking"></i>
+                    <span>SmartPark</span>
+                </div>
+                <div class="header-title">User Dashboard</div>
+            </div>
+            <nav class="header-nav">
+                <a class='nav-link' href='/'>
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a class='nav-link active' href='/user_dashboard'>
+                    <i class="fas fa-car"></i> User
+                </a>
+            </nav>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Vehicle Entry -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-sign-in-alt"></i> Vehicle Entry</h2>
+                </div>
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label>License Plate Number</label>
+                        <input type="text" id="entryPlate" placeholder="e.g., ABC-1234" maxlength="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle Type</label>
+                        <select id="vehicleType">
+                            <option value="car">🚗 Car / Sedan</option>
+                            <option value="suv">🚙 SUV / Crossover</option>
+                            <option value="truck">🚚 Truck / Pickup</option>
+                            <option value="motorcycle">🏍️ Motorcycle</option>
+                            <option value="electric">⚡ Electric Vehicle</option>
+                        </select>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-parking"></i> Park Vehicle
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="exitAllVehicles()">
+                            <i class="fas fa-sign-out-alt"></i> Exit All Vehicles
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Entry Result Display -->
+                <div id="entryResult" style="display: none; margin-top: 20px;" class="result-box">
+                    <div class="summary-item">
+                        <span class="label">Plate Number</span>
+                        <span class="value" id="resultPlate">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Assigned Slot</span>
+                        <span class="value" id="resultSlot">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Entry Time</span>
+                        <span class="value" id="resultTime">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Area</span>
+                        <span class="value" id="resultArea">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Exit -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-sign-out-alt"></i> Vehicle Exit</h2>
+                </div>
+                <form id="exitForm">
+                    <div class="form-group">
+                        <label>Parking Slot Number</label>
+                        <input type="number" id="exitSlot" placeholder="Enter slot number" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Or Search by Plate</label>
+                        <input type="text" id="exitPlate" placeholder="License plate number" maxlength="10">
+                    </div>
+                    <button type="submit" class="btn-primary btn-block">
+                        <i class="fas fa-credit-card"></i> Process Payment & Exit
+                    </button>
+                </form>
+
+                <!-- Exit Result Display -->
+                <div id="exitResult" style="display: none; margin-top: 20px;" class="result-box">
+                    <div class="summary-item">
+                        <span class="label">Parking Duration</span>
+                        <span class="value" id="durationValue">00:00:00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Total Fee</span>
+                        <span class="value revenue" id="totalFee">$0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Plate Number</span>
+                        <span class="value" id="exitResultPlate">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Exit Time</span>
+                        <span class="value" id="exitResultTime">--</span>
+                    </div>
+                    <button class="btn-secondary btn-block" style="margin-top: 15px;" onclick="printReceipt()">
+                        <i class="fas fa-print"></i> Print Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEntryForm();
+            setupExitForm();
+        });
+
+        function setupEntryForm() {
+            const form = document.getElementById('entryForm');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const plate = document.getElementById('entryPlate').value.toUpperCase();
+                const type = document.getElementById('vehicleType').value;
+                
+                try {
+                    const result = await api.parkVehicle(plate, type);
+                    if (result.success) {
+                        showToast('success', `Vehicle ${plate} parked in Slot ${result.slotId}`);
+                        document.getElementById('resultPlate').textContent = plate;
+                        document.getElementById('resultSlot').textContent = result.slotId;
+                        document.getElementById('resultTime').textContent = new Date().toLocaleTimeString();
+                        document.getElementById('resultArea').textContent = result.area || 'Ground Floor';
+                        document.getElementById('entryResult').style.display = 'block';
+                        form.reset();
+                        
+                        // Load transactions to ensure it appears in admin list
+                        await api.getTransactions();
+                    } else {
+                        showToast('error', result.message || 'Failed to park vehicle');
+                    }
+                } catch (error) {
+                    showToast('error', 'Connection error. Please try again.');
+                }
+            });
+        }
+
+        function setupExitForm() {
+            const form = document.getElementById('exitForm');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const slotId = document.getElementById('exitSlot').value;
+                const plate = document.getElementById('exitPlate').value.toUpperCase();
+                
+                try {
+                    const result = await api.removeVehicle(slotId, plate);
+                    if (result.success) {
+                        const fee = result.fee || 0;
+                        const duration = result.duration || '00:00:00';
+                        showToast('success', `Exit processed. Fee: $${fee.toFixed(2)}`);
+                        document.getElementById('durationValue').textContent = duration;
+                        document.getElementById('totalFee').textContent = `$${fee.toFixed(2)}`;
+                        document.getElementById('exitResultPlate').textContent = result.plate || plate || 'Unknown';
+                        document.getElementById('exitResultTime').textContent = new Date().toLocaleTimeString();
+                        document.getElementById('exitResult').style.display = 'block';
+                        form.reset();
+                        
+                        // Load transactions to ensure it updates in admin dashboard
+                        await api.getTransactions();
+                        
+                        // Load transactions again to refresh the data
+                        await api.getTransactions();
+                    } else {
+                        showToast('error', result.message || 'Vehicle not found');
+                    }
+                } catch (error) {
+                    showToast('error', 'Connection error. Please try again.');
+                }
+            });
+        }
+
+        function printReceipt() {
+            window.print();
+        }
+
+        async function exitAllVehicles() {
+            if (confirm('Are you sure you want to exit ALL parked vehicles?\n\nThis will:\n• Exit all currently parked vehicles\n• Calculate fees for all vehicles\n• Add all fees to admin earnings\n\nThis action cannot be undone!')) {
+                try {
+                    const transactions = await api.getTransactions();
+                    const parkedVehicles = transactions ? transactions.filter(t => !t.completed) : [];
+                    
+                    if (parkedVehicles.length === 0) {
+                        showToast('info', 'No vehicles currently parked');
+                        return;
+                    }
+                    
+                    let totalFee = 0;
+                    let exitedCount = 0;
+                    
+                    // Exit each parked vehicle
+                    for (const vehicle of parkedVehicles) {
+                        const result = await api.removeVehicle(vehicle.slotId, vehicle.plate);
+                        if (result.success) {
+                            totalFee += result.fee || 0;
+                            exitedCount++;
+                        }
+                    }
+                    
+                    showToast('success', `Exited ${exitedCount} vehicles. Total fees: $${totalFee.toFixed(2)}`);
+                } catch (error) {
+                    showToast('error', 'Failed to exit all vehicles');
+                    console.error('Exit all error:', error);
+                }
+            }
+        }
+
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
